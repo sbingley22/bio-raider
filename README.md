@@ -17,7 +17,7 @@ Gameplay will involve shooting enemies with auto aim lockon, using items, applyi
 
 TODO:
 Load in levels and main character
-
+Allow loading in of alt dev assets through imports
 
 
 To get Xbox Controller Working change in package.json
