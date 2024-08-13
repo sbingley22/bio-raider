@@ -26,10 +26,12 @@ interface PlayerProps {
   gamepadRef: MutableRefObject<GamepadState | null> | null,
   anim: MutableRefObject<string | null>, 
   transition: MutableRefObject<string | null>,
-  takeDamage: (dmg: number) => string | null
+  takeDamage: (dmg: number) => string | null,
+  rotateToVec: (dx: number, dy: number) => void,
+  moveInBounds: (dx: number, dy: number) => void,
 }
 
-const Player = ({ group, gamepadRef, anim, transition, takeDamage }: PlayerProps) => {
+const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, moveInBounds }: PlayerProps) => {
   // console.log("Player Rerender")
   const [visibleNodes, setVisibleNodes] = useState(outfits[0])
   const outfit = useRef(0)
@@ -59,6 +61,10 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage }: PlayerProps
     else if (aimRightKey) aX = 1
     if (aimUpKey) aY = -1
     else if (aimDownKey) aY = 1
+    if (Math.abs(dX) >= 1 && Math.abs(dY) >= 1) {
+      dX *= 0.7
+      dY *= 0.7
+    }
 
     let jump = false
     if (gamepadValid) {
@@ -89,12 +95,19 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage }: PlayerProps
   const movement = (inputs: Inputs, delta: number) => {
     if (group.current === null) return
 
-    let speed = 1
-    if (inputs.dX) {
-      group.current.position.x += inputs.dX * speed * delta
-    }
-    if (inputs.dY) {
-      group.current.position.z += inputs.dY * speed * delta
+    if (inputs.dX || inputs.dY)
+    {
+      let speed = 3
+      let dx = 0
+      let dy = 0
+      if (inputs.dX) {
+        dx += inputs.dX * speed * delta
+      }
+      if (inputs.dY) {
+        dy += inputs.dY * speed * delta
+      }
+      moveInBounds(dx, dy)
+      rotateToVec(inputs.dX, inputs.dY)
     }
   }
 

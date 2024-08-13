@@ -23,7 +23,7 @@ const Game: React.FC<GameProps> = ({ gamepadRef }) => {
         <Canvas
           camera={{
             position: [0, 8, 8],
-            fov: 20,
+            fov: 50,
           }}
         >
           <Environment preset="night" environmentIntensity={4} />
@@ -33,6 +33,7 @@ const Game: React.FC<GameProps> = ({ gamepadRef }) => {
           <Character 
             type="Player"
             gamepadRef={gamepadRef}
+            health={100}
           />
 
         </Canvas>
