@@ -1,11 +1,15 @@
-import { useState } from "react"
 import Game from "./components/Game"
 import useGamepad from "./components/useGamepad"
 import { KeyboardControls } from "@react-three/drei"
 import Gamepad from "react-gamepad"
+import { useGameStore } from "./components/useGameStore"
 
 function App() {
-  const [mode, setMode] = useState(1)
+  // const [mode, setMode] = useState(1)
+  // const [options, setOptions] = useState({
+  //   altCost: 0,
+  // })
+  const { mode, setMode, options, setOptions } = useGameStore()
   
   // Use the custom useGamepad hook
   const {
@@ -35,6 +39,8 @@ function App() {
           { name: "aimDownKey", keys: ["k", "K"] },
           { name: "aimLeftKey", keys: ["j", "J"] },
           { name: "aimRightKey", keys: ["l", "L"] },
+          { name: "outfitPrev", keys: ["9"] },
+          { name: "outfitNext", keys: ["0"] },
         ]}
       >
         <Gamepad
@@ -56,8 +62,10 @@ function App() {
             {mode === 1 &&
               <>
                 <Game
-                  setMode={setMode}
+                  // setMode={setMode}
                   gamepadRef={gamepadRef}
+                  // options={options}
+                  // setOptions={setOptions}
                 />
               </>
             }
