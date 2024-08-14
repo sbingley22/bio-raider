@@ -3,7 +3,6 @@ import * as THREE from "three"
 import { GamepadState } from "../useGamepad"
 import Player from "./Player"
 import { useThree } from "@react-three/fiber"
-import { arenas } from "../../assets/levels"
 import { useGameStore } from "../useGameStore"
 
 const vec3 = new THREE.Vector3()
@@ -49,11 +48,15 @@ const Character: React.FC<{
     let zNear = 5
     let zFar = -5
     const lvl = levels[level[0]][level[1]]
-    if (lvl && lvl.arena) {
-      const arenaSize = lvl.arena
+    if (lvl && lvl.size) {
+      const arenaSize = lvl.size
       if (arenaSize === "small") {
         zNear = 3
         zFar = -2
+      }
+      else if (arenaSize === "large") {
+        zNear = 5
+        zFar = -5
       }
     }
 
@@ -66,8 +69,17 @@ const Character: React.FC<{
   const moveInBounds = (dx: number, dy: number) => {
     if (!group.current) return
     const bounds = withinBounds(group.current.position.x + dx, group.current.position.z + dy)
+
+    let outOfBounds: number | null = null
+    if (bounds.clampedX > group.current.position.x + dx) outOfBounds = 0
+    else if (bounds.clampedX < group.current.position.x + dx) outOfBounds = 2
+    else if (bounds.clampedZ > group.current.position.z + dy) outOfBounds = 1
+    else if (bounds.clampedZ < group.current.position.z + dy) outOfBounds = 3
+
     group.current.position.x = bounds.clampedX
     group.current.position.z = bounds.clampedZ
+
+    return outOfBounds
   }
 
   const takeDamage = (dmg: number) => {
@@ -101,28 +113,6 @@ const Character: React.FC<{
       group.current.userData.health = health
     }
   }, [health])
-
-  useEffect(() => {
-    const lvl = levels[level[0]][level[1]]
-    if (!lvl) {
-      console.error("Cannot Load Level!")
-      return
-    }
-
-    if (lvl.arena) {
-      if (camera) {
-        if (lvl.arena === "small") {
-          camera.position.y = 5
-          camera.position.z = 5
-        }
-        else if (lvl.arena === "large") {
-          camera.position.y = 8
-          camera.position.z = 8
-        }
-      }
-    }
-
-  }, [camera, level, levels])
 
   return (
     <group 

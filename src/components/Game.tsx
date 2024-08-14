@@ -1,41 +1,35 @@
-import { Environment } from "@react-three/drei"
 import { Canvas } from "@react-three/fiber"
-import { MutableRefObject, SetStateAction, Suspense, Dispatch } from "react"
-import ShadowCatcher from "./ShadowCatcher"
-import Character from "./characters/Character"
+import { MutableRefObject, Suspense, } from "react"
 import { GamepadState } from "./useGamepad"
 import { useGameStore } from "./useGameStore"
+import Arena from "./Arena"
 
 interface GameProps {
-  // setMode: (mode: number) => void
-  //setMode: React.Dispatch<React.SetStateAction<number>>;
   gamepadRef: MutableRefObject<GamepadState>
-  // options: { altCost: number }
-  // setOptions: Dispatch<SetStateAction<{ altCost: number }>>
 }
 
 const Game: React.FC<GameProps> = ({ gamepadRef }) => {
-  const { setMode, options, setOptions } = useGameStore()
-
+  const { levelImg } = useGameStore()
+  console.log(levelImg)
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full"
+      style={{
+        backgroundImage: `url(./bgs/${levelImg})`, 
+        // backgroundImage: `url(./bgs/)`, 
+        backgroundSize: "cover", 
+        backgroundPosition: "center"
+      }}>
       <Suspense fallback={<div>Loading...</div>}>
         <Canvas
           camera={{
             position: [0, 8, 8],
             fov: 50,
           }}
+          shadows
         >
-          <Environment preset="night" environmentIntensity={4} />
-          <ShadowCatcher />
-          <directionalLight castShadow position={[0, 10, 0]} intensity={0.1} />
-
-          <Character 
-            type="Player"
+          <Arena 
             gamepadRef={gamepadRef}
-            health={100}
           />
-
         </Canvas>
       </Suspense>
     </div>

@@ -111,20 +111,23 @@ const SurvivorModel: React.FC<{
 
   // Update Animations
   const updateAnimations = () => {
-    if (anim.current === lastAnim.current) return;
+    if (anim.current === lastAnim.current) return
+    // console.log(anim.current)
+    // debugger
 
-    if (!actions || !lastAnim.current) return;
+    if (!actions) return
+    if (!lastAnim.current) lastAnim.current = ""
     if (!anim.current) anim.current = "Idle"
 
-    const fadeTime = getFadeTime();
+    const fadeTime = getFadeTime()
 
-    const lastAction = actions[lastAnim.current];
-    const currentAction = actions[anim.current];
+    const lastAction = actions[lastAnim.current]
+    const currentAction = actions[anim.current]
 
-    if (lastAction) lastAction.fadeOut(fadeTime);
-    if (currentAction) currentAction.reset().fadeIn(fadeTime).play();
+    if (lastAction) lastAction.fadeOut(fadeTime)
+    if (currentAction) currentAction.reset().fadeIn(fadeTime).play()
 
-    lastAnim.current = anim.current;
+    lastAnim.current = anim.current
   }
 
   // Game Loop
