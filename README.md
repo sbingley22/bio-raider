@@ -16,8 +16,9 @@ Max inventory of 6. Any items must be dropped to make space.
 Gameplay will involve shooting enemies with auto aim lockon, using items, applying finishing moves, jumping to dodge certain attacks, avoiding floor traps by jumping/manuvering, some pseudo platforming on rooms without enemies.
 
 TODO:
-Load in levels and main character
 Allow loading in of alt dev assets through imports
+
+
 
 
 To get Xbox Controller Working change in package.json

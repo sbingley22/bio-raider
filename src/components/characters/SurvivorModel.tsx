@@ -68,6 +68,7 @@ const SurvivorModel: React.FC<{
     const animFinished = (e: AnimationMixerEvent) => {
       const action = e.action.getClip().name
       // console.log(action)
+      // debugger
 
       if (action === "Pistol Fire") {
         if (anim.current === "Fight Roundhouse") return
@@ -98,7 +99,7 @@ const SurvivorModel: React.FC<{
 
     mixer.addEventListener("finished", animFinished)
 
-    return mixer.removeEventListener("finished", animFinished)
+    return () => mixer.removeEventListener("finished", animFinished)
   }, [mixer, actions, anim, transition])
 
   const getFadeTime = () => {

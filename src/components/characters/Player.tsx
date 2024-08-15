@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MutableRefObject, useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
 import { useKeyboardControls } from "@react-three/drei"
@@ -7,7 +8,7 @@ import SurvivorModel from "./SurvivorModel"
 import { useGameStore } from "../useGameStore"
 
 const outfits = [
-  ["SurvivorF", "Hair-WavyPunk", "Pistol", "GownFull"],
+  ["SurvivorF", "Hair-WavyPunk", "Pistol", "GownFull", "Shoes-HighTops001"],
   ["SurvivorF", "Hair-WavyPunk", "Pistol", "GownTop", "Shoes-HighTops001"],
   ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "GownTop", "Shoes-HighTops001"],
   ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "Shoes-HighTops001"],
@@ -37,11 +38,12 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   // console.log("Player Rerender")
   const [visibleNodes, setVisibleNodes] = useState(outfits[0])
   const outfit = useRef(0)
-  const { arenaClear, level, setLevel, levels } = useGameStore()
+  const { setMode, arenaClear, level, setLevel, levels, playAudio } = useGameStore()
   const lvl = levels[level[0]][level[1]]
 
   const [, getKeys] = useKeyboardControls()
   const generalKeyHeld = useRef<boolean>(false)
+  const jumpForce = useRef<number | null>(null)
 
   const getInputs = (): Inputs => {
     const { forwardKey, backwardKey, leftKey, rightKey, jumpKey, interactKey, inventoryLeftKey, inventoryRightKey, inventoryUseKey, shiftKey, aimUpKey, aimLeftKey, aimRightKey, aimDownKey, outfitPrev, outfitNext } = getKeys()
@@ -88,6 +90,28 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
 
     return { shift, dX, dY, aX, aY, jump, outfitD }
   }
+
+  const damaged = (flag: any) => {
+    if (!group.current) return
+
+    const dmgStatus = takeDamage(flag)
+    if (dmgStatus==="damaged") {
+      playAudio("./audio/f-hurt.ogg", 0.7)
+      
+      if (group.current.userData.health <= 0) {
+        // game over
+        anim.current = "Dying"
+        setTimeout(()=>{
+          setMode(0)
+        }, 1000)
+      }
+
+      // setHudInfo(prev => ({
+      //   ...prev,
+      //   health: group.current.health
+      // }))
+    }
+  }
   
   const isUnskippableAnimation = () => {
     const a = anim.current
@@ -122,7 +146,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     {
       let walking = false
       let injured = false
-      let speed = 3
+      let speed = 4
       if (group.current.userData.health < 35) {
         walking = true
         injured = true
@@ -169,10 +193,47 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
       transition.current = "Idle"
     }
   }
+  
+  const jumping = (inputs: Inputs, delta: number) => {
+    if (!group.current) return
+
+    if (jumpForce.current === null) {
+      // player is grounded
+      if (isUnskippableAnimation()) return
+      if (inputs.aX || inputs.aY) return
+      if (inputs.jump) {
+        jumpForce.current = 0.09
+        anim.current = "Jump"
+      }
+    }
+    else {
+      // player is jumping
+      jumpForce.current -= delta * 0.15
+      group.current.position.y += jumpForce.current
+      if (group.current.position.y <= 0) {
+        // player has landed
+        group.current.position.y = 0
+        anim.current = "Land"
+        jumpForce.current = null
+      }
+    }
+  }
 
   useFrame((_state,delta) => {
     const inputs = getInputs()
+
+    // Check Flags
+    if (group.current?.userData.actionFlag) {
+      group.current.userData.actionFlag = null
+    }
+    if (group.current?.userData.dmgFlag) {
+      damaged(group.current.userData.dmgFlag)
+      group.current.userData.dmgFlag = null
+    }
+
     movement(inputs, delta)
+    jumping(inputs, delta)
+
     updateInventory(inputs)
   })
 

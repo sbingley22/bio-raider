@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef, MutableRefObject, useEffect } from "react"
 import * as THREE from "three"
 import { GamepadState } from "../useGamepad"
@@ -67,7 +68,7 @@ const Character: React.FC<{
     return {clampedX, clampedZ}
   }
   const moveInBounds = (dx: number, dy: number) => {
-    if (!group.current) return
+    if (!group.current) return null
     const bounds = withinBounds(group.current.position.x + dx, group.current.position.z + dy)
 
     let outOfBounds: number | null = null
@@ -82,12 +83,22 @@ const Character: React.FC<{
     return outOfBounds
   }
 
-  const takeDamage = (dmg: number) => {
+  const takeDamage = (flag: any) => {
     if (!group.current) return null
     let tempHealth = group.current.userData.health
     if (!tempHealth) return null
 
-    tempHealth -= dmg
+    // incoming melee
+    if (flag.type === "melee") {
+      if (flag.pos) {
+        if (flag.range) {
+          const distance = group.current.position.distanceTo(flag.pos)
+          if (distance > flag.range) return "missed"
+        }
+      }
+    }
+
+    tempHealth -= flag.dmg
     group.current.userData.health = tempHealth
 
     return "damaged"

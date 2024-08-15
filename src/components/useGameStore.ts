@@ -32,6 +32,8 @@ interface GameState {
   setArenaClear: (arenaClear: boolean) => void
   enemies: Array<EnemyObject>
   setEnemies: (enemies: Array<EnemyObject>) => void
+
+  playAudio: (src: string, volume?: number) => void
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -55,5 +57,11 @@ export const useGameStore = create<GameState>((set) => ({
   arenaClear: false,
   setArenaClear: (arenaClear) => set({ arenaClear }),
   enemies: [],
-  setEnemies: (enemies) => set({ enemies }),
+
+  playAudio: (src, volume = 1) => {
+    const audio = new Audio(src);
+    audio.volume = volume;
+    audio.play();
+  }, setEnemies: (enemies) => set({ enemies }),
+
 }))

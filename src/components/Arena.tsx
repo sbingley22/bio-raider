@@ -62,8 +62,16 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
   return (
     <>
       <Environment preset="night" environmentIntensity={4} />
-      <ShadowCatcher />
-      <directionalLight castShadow position={[0, 10, 0]} intensity={0.1} />
+      <ShadowCatcher scale={2} />
+      <directionalLight 
+        castShadow 
+        position={[0, 10, 0]} 
+        intensity={0.1}
+        shadow-camera-left={-10}
+        shadow-camera-right={10}
+        shadow-camera-top={10}
+        shadow-camera-bottom={-10} 
+      />
 
       <Character 
         type="Player"

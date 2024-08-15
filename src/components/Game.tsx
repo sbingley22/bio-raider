@@ -10,7 +10,7 @@ interface GameProps {
 
 const Game: React.FC<GameProps> = ({ gamepadRef }) => {
   const { levelImg } = useGameStore()
-  console.log(levelImg)
+
   return (
     <div className="w-full h-full"
       style={{

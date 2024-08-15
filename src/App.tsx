@@ -5,10 +5,6 @@ import Gamepad from "react-gamepad"
 import { useGameStore } from "./components/useGameStore"
 
 function App() {
-  // const [mode, setMode] = useState(1)
-  // const [options, setOptions] = useState({
-  //   altCost: 0,
-  // })
   const { mode, setMode, options, setOptions } = useGameStore()
   
   // Use the custom useGamepad hook

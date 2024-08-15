@@ -4,13 +4,13 @@ export const arenas = {
   "vasculature": {
     "small": [
       {
-        img: "vasculature2.png",
+        img: "vasculatureSmall0.png",
         enemies: [],
       }
     ],
     "large": [
       {
-        img: "vasculature3.png",
+        img: "vasculatureLarge0.png",
         enemies: [],
       }
     ],
