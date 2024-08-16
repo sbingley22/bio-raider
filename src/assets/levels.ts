@@ -11,7 +11,26 @@ export const arenas = {
     "large": [
       {
         img: "vasculatureLarge0.png",
-        enemies: [],
+        enemies: [
+          {
+            id: uuidv4(),
+            model: "NKCell",
+            health: 100,
+            pos: [-1,0,3],
+          },
+          {
+            id: uuidv4(),
+            model: "Neutrophil",
+            health: 100,
+            pos: [3,0,5],
+          },
+          {
+            id: uuidv4(),
+            model: "NKCell",
+            health: 100,
+            pos: [-1,0,7],
+          },
+        ],
       }
     ],
   },

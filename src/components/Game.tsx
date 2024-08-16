@@ -3,6 +3,7 @@ import { MutableRefObject, Suspense, } from "react"
 import { GamepadState } from "./useGamepad"
 import { useGameStore } from "./useGameStore"
 import Arena from "./Arena"
+import Hud from "./Hud"
 
 interface GameProps {
   gamepadRef: MutableRefObject<GamepadState>
@@ -32,6 +33,8 @@ const Game: React.FC<GameProps> = ({ gamepadRef }) => {
           />
         </Canvas>
       </Suspense>
+
+      <Hud />
     </div>
   )
 }

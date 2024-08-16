@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MutableRefObject, useRef, useState } from "react"
+import { MutableRefObject, useEffect, useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
 import { useKeyboardControls } from "@react-three/drei"
 import * as THREE from "three"
@@ -22,6 +22,7 @@ interface Inputs {
   aY: number
   jump: boolean
   outfitD: number
+  interact: boolean
 }
 
 interface PlayerProps {
@@ -29,6 +30,7 @@ interface PlayerProps {
   gamepadRef: MutableRefObject<GamepadState | null> | null,
   anim: MutableRefObject<string | null>, 
   transition: MutableRefObject<string | null>,
+  enemies: Array<any>,
   takeDamage: (dmg: number) => string | null,
   rotateToVec: (dx: number, dy: number) => void,
   moveInBounds: (dx: number, dy: number) => number | null,
@@ -38,7 +40,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   // console.log("Player Rerender")
   const [visibleNodes, setVisibleNodes] = useState(outfits[0])
   const outfit = useRef(0)
-  const { setMode, arenaClear, level, setLevel, levels, playAudio } = useGameStore()
+  const { setMode, arenaClear, level, setLevel, levels, setPlayer, enemies, playAudio } = useGameStore()
   const lvl = levels[level[0]][level[1]]
 
   const [, getKeys] = useKeyboardControls()
@@ -85,10 +87,13 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     if (outfitPrev && !generalKeyHeld.current) outfitD = -1
     else if (outfitNext && !generalKeyHeld.current) outfitD = 1
 
-    if (outfitNext || outfitPrev || inventoryLeftKey || inventoryRightKey) generalKeyHeld.current = true
+    let interact = false
+    if (interactKey && !generalKeyHeld.current) interact = true
+
+    if (outfitNext || outfitPrev || inventoryLeftKey || inventoryRightKey || interactKey) generalKeyHeld.current = true
     else generalKeyHeld.current = false
 
-    return { shift, dX, dY, aX, aY, jump, outfitD }
+    return { shift, dX, dY, aX, aY, jump, outfitD, interact }
   }
 
   const damaged = (flag: any) => {
@@ -172,19 +177,19 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
         // console.log(outOfBounds)
         if (outOfBounds === 0 && lvl.pathLeft === "open") {
           setLevel([level[0], level[1] - 1])
-          group.current.position.x = 2.5
+          group.current.position.x = 16
         }
         else if (outOfBounds === 1 && lvl.pathUp === "open") {
           setLevel([level[0] + 1, level[1]])
-          group.current.position.z = 2.5
+          group.current.position.z = 16
         }
         if (outOfBounds === 2 && lvl.pathRight === "open") {
           setLevel([level[0], level[1] + 1])
-          group.current.position.x = -2.5
+          group.current.position.x = -10
         }
         else if (outOfBounds === 3 && lvl.pathDown === "open") {
           setLevel([level[0] - 1, level[1]])
-          group.current.position.z = -2
+          group.current.position.z = -0
         }
       }
     }
@@ -219,6 +224,13 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     }
   }
 
+  useEffect(()=>{
+    if (!group.current) return
+
+    group.current.userData.enemies = []
+    setPlayer(group)
+  }, [group, setPlayer])
+
   useFrame((_state,delta) => {
     const inputs = getInputs()
 
@@ -235,6 +247,8 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     jumping(inputs, delta)
 
     updateInventory(inputs)
+    
+    if (inputs.interact) console.log(group.current?.userData.enemies)
   })
 
   return (

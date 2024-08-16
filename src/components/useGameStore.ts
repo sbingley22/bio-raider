@@ -1,5 +1,8 @@
 import { create } from "zustand"
 import { arenas, levelData } from "../assets/levels"
+import * as THREE from 'three'
+import { MutableRefObject } from 'react'
+
 
 interface GameOptions {
   altCost: number
@@ -20,16 +23,18 @@ interface GameState {
   setMode: (mode: number) => void
   options: GameOptions
   setOptions: (options: Partial<GameOptions>) => void
-  arenas: any
-  setArenas: (arenas: any) => void
+  arenas: never
+  setArenas: (arenas: never) => void
   level: Array<number>
   setLevel: (level: Array<number>) => void
-  levels: Array<Array<any>>
-  setLevels: (levels: Array<Array<any>>) => void
+  levels: Array<Array<never>>
+  setLevels: (levels: Array<Array<never>>) => void
   levelImg: string
   setLevelImg: (levelImg: string) => void
   arenaClear: boolean
   setArenaClear: (arenaClear: boolean) => void
+  player: MutableRefObject<THREE.Group> | null
+  setPlayer: (player: THREE.Group) => void
   enemies: Array<EnemyObject>
   setEnemies: (enemies: Array<EnemyObject>) => void
 
@@ -56,12 +61,15 @@ export const useGameStore = create<GameState>((set) => ({
   setLevelImg: (levelImg) => set({ levelImg }),
   arenaClear: false,
   setArenaClear: (arenaClear) => set({ arenaClear }),
+  player: null,
+  setPlayer: (player) => set({ player }),
   enemies: [],
+  setEnemies: (enemies) => set({ enemies }),
 
   playAudio: (src, volume = 1) => {
     const audio = new Audio(src);
     audio.volume = volume;
     audio.play();
-  }, setEnemies: (enemies) => set({ enemies }),
+  },
 
 }))

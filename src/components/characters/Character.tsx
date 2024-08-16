@@ -5,6 +5,7 @@ import { GamepadState } from "../useGamepad"
 import Player from "./Player"
 import { useThree } from "@react-three/fiber"
 import { useGameStore } from "../useGameStore"
+import Enemy from "./Enemy"
 
 const vec3 = new THREE.Vector3()
 const vec3b = new THREE.Vector3()
@@ -13,8 +14,11 @@ const quat = new THREE.Quaternion()
 const Character: React.FC<{ 
   type: string,
   gamepadRef: MutableRefObject<GamepadState> | null,
+  id: never | null,
+  model: string | null,
   health: number,
-}> = ({ type, gamepadRef, health=100 }) => {
+  position: Array<number>,
+}> = ({ type, gamepadRef=null, id=null, model=null, health=100, position=[0,0,0] }) => {
   const group = useRef<THREE.Group>(null)
   const anim = useRef<string>(null)
   const transition = useRef<string>(null)
@@ -52,12 +56,12 @@ const Character: React.FC<{
     if (lvl && lvl.size) {
       const arenaSize = lvl.size
       if (arenaSize === "small") {
-        zNear = 3
-        zFar = -2
+        zNear = 6
+        zFar = -0
       }
       else if (arenaSize === "large") {
-        zNear = 5
-        zFar = -5
+        zNear = 9.5
+        zFar = -0
       }
     }
 
@@ -128,6 +132,7 @@ const Character: React.FC<{
   return (
     <group 
       ref={group}
+      position={position}
     >
       {type==="Player" && <Player
         group={group}
@@ -139,6 +144,16 @@ const Character: React.FC<{
         moveInBounds={moveInBounds}
       />}
 
+      {type==="Enemy" && <Enemy
+        id={id}
+        model={model}
+        group={group}
+        anim={anim}
+        transition={transition}
+        takeDamage={takeDamage}
+        rotateToVec={rotateToVec}
+        moveInBounds={moveInBounds}
+      />}
     </group>
   )
 }

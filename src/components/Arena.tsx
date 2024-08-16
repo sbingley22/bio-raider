@@ -1,6 +1,6 @@
-import { useThree } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { Environment } from "@react-three/drei"
-import React, { useEffect, MutableRefObject } from 'react'
+import React, { useEffect, MutableRefObject, useRef } from 'react'
 import { GamepadState } from './useGamepad'
 import { useGameStore } from './useGameStore'
 import ShadowCatcher from "./ShadowCatcher"
@@ -13,6 +13,7 @@ interface ArenaProps {
 const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
   const { camera } = useThree()
   const { arenas, level, levels, setLevelImg, setArenaClear, enemies, setEnemies } = useGameStore()
+  const arenaTimer = useRef<number>(0)
   
   useEffect(() => {
     const lvl = levels[level[0]][level[1]]
@@ -24,7 +25,7 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
       console.error("Cannot Find Arena")
       return
     }
-    console.log("New Level: ", lvl.name, level)
+    // console.log("New Level: ", lvl.name, level)
 
     let arena = arenas[lvl.name]
     if (lvl.type === "random") {
@@ -39,25 +40,39 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
       if (camera) {
         if (lvl.size === "small") {
           camera.position.y = 5
-          camera.position.z = 5
+          camera.position.z = 8
         }
         else if (lvl.size === "large") {
           camera.position.y = 8
-          camera.position.z = 8
+          camera.position.z = 12.8
         }
       }
     }
 
+    arenaTimer.current = 0
+    setArenaClear(false)
     if (arena.enemies && arena.enemies.length > 0) {
       setEnemies(arena.enemies)
-      setArenaClear(false)
+      // console.log(arena.enemies, enemies)
     }
     else {
       setEnemies([])
-      setArenaClear(true)
     }
 
   }, [arenas, camera, level, levels, setArenaClear, setEnemies, setLevelImg])
+
+  useFrame((_state,delta)=>{
+    if (arenaTimer.current !== null) {
+      arenaTimer.current += delta
+
+      if (arenaTimer.current > 1) {
+        if (enemies.length <= 0) {
+          setArenaClear(true)
+        }
+      }
+    }
+  })
+  
 
   return (
     <>
@@ -78,6 +93,17 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
         gamepadRef={gamepadRef}
         health={75}
       />
+
+      {Array.isArray(enemies) && enemies.map((enemy) => (
+        <Character
+          key={enemy.id}
+          type='Enemy'
+          id={enemy.id}
+          model={enemy.model}
+          health={enemy.health}
+          position={enemy.pos}
+        />
+      ))}
     </>
   )
 }
