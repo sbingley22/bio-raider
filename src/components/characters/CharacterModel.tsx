@@ -28,6 +28,7 @@ const CharacterModel: React.FC<{
 
     if (actions["float idle"]) {
       actions["float idle"].play()
+      lastAnim.current = "float idle"
     }
   }, [nodes, actions])
 
@@ -58,16 +59,17 @@ const CharacterModel: React.FC<{
     if (!mixer) return
     if (actions === null) return
 
-    const oneShotAnims = ["float dmg", "float jab"]
+    const oneShotAnims = ["float dmg", "float jab", "float straight", "float dying", "float stunned"]
     oneShotAnims.forEach(osa => {
       if (actions[osa] === null) return
       actions[osa].clampWhenFinished = true
       actions[osa].repetitions = 1
     })
+    if (actions["float stunned"]) actions["float stunned"].repetitions = 3
 
     const animFinished = (e) => {
       const action = e.action.getClip().name
-      console.log("action finished", action)
+      //console.log("action finished", action)
       // debugger
 
       if (action === "float dmg") {
@@ -79,7 +81,9 @@ const CharacterModel: React.FC<{
         anim.current = "float stance"
         return
       }
-      if (action === "dying") {
+      if (action === "float dying") {
+        anim.current = "float dying"
+        lastAnim.current = "float dying"
         return
       }
 
@@ -93,6 +97,7 @@ const CharacterModel: React.FC<{
 
   const getFadeTime = () => {
     let trans = 0.1
+    if (anim.current === "float jab") trans = 0.09
 
     return trans
   }
@@ -101,7 +106,7 @@ const CharacterModel: React.FC<{
   const updateAnimations = () => {
     if (anim.current === lastAnim.current) return
     // console.log(anim.current)
-    // debugger
+    //if (anim.current === "float jab") debugger
 
     if (!actions) return
     if (!lastAnim.current) lastAnim.current = ""

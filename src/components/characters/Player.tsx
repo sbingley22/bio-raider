@@ -102,12 +102,13 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     const dmgStatus = takeDamage(flag)
     if (dmgStatus==="damaged") {
       playAudio("./audio/f-hurt.ogg", 0.7)
+      anim.current = "Take Damage"
       
       if (group.current.userData.health <= 0) {
         // game over
         anim.current = "Dying"
         setTimeout(()=>{
-          setMode(0)
+          // setMode(0)
         }, 1000)
       }
 
