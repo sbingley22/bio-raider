@@ -12,7 +12,7 @@ interface ArenaProps {
 
 const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
   const { camera } = useThree()
-  const { arenas, level, levels, setLevelImg, setArenaClear, enemies, setEnemies } = useGameStore()
+  const { arenas, level, levels, setLevelImg, arenaClear, setArenaClear, enemies, setEnemies } = useGameStore()
   const arenaTimer = useRef<number>(0)
   
   useEffect(() => {
@@ -67,7 +67,7 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
 
       if (arenaTimer.current > 1) {
         if (enemies.length <= 0) {
-          setArenaClear(true)
+          if (!arenaClear) setArenaClear(true)
         }
       }
     }

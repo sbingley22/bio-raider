@@ -23,12 +23,12 @@ interface GameState {
   setMode: (mode: number) => void
   options: GameOptions
   setOptions: (options: Partial<GameOptions>) => void
-  arenas: never
+  arenas: any
   setArenas: (arenas: never) => void
   level: Array<number>
   setLevel: (level: Array<number>) => void
-  levels: Array<Array<never>>
-  setLevels: (levels: Array<Array<never>>) => void
+  levels: Array<Array<any>>
+  setLevels: (levels: Array<Array<any>>) => void
   levelImg: string
   setLevelImg: (levelImg: string) => void
   arenaClear: boolean
@@ -37,6 +37,12 @@ interface GameState {
   setPlayer: (player: THREE.Group) => void
   enemies: Array<EnemyObject>
   setEnemies: (enemies: Array<EnemyObject>) => void
+  hudInfo: any
+  setHudInfo: (hudInfo: any) => void
+  inventory: Array<any>
+  setInventory: (inventory: Array<any>) => void
+  inventorySlot: number
+  setInventorySlot: (inventorySlot: number) => void
 
   playAudio: (src: string, volume?: number) => void
 }
@@ -65,6 +71,25 @@ export const useGameStore = create<GameState>((set) => ({
   setPlayer: (player) => set({ player }),
   enemies: [],
   setEnemies: (enemies) => set({ enemies }),
+  hudInfo: {
+    msg: "",
+    health: 100,
+  },
+  setHudInfo: (hudInfo) => set({ hudInfo }),
+  inventory: [
+    {
+      name: "stun grenade",
+      amount: 1,
+    },
+    {name:"",amount:0},
+    {name:"",amount:0},
+    {name:"",amount:0},
+    {name:"",amount:0},
+    {name:"",amount:0},
+  ],
+  setInventory: (inventory) => set({ inventory }),
+  inventorySlot: 0,
+  setInventorySlot: (inventorySlot) => set({ inventorySlot }),
 
   playAudio: (src, volume = 1) => {
     const audio = new Audio(src);

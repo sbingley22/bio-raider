@@ -40,7 +40,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   // console.log("Player Rerender")
   const [visibleNodes, setVisibleNodes] = useState(outfits[0])
   const outfit = useRef(0)
-  const { setMode, arenaClear, level, setLevel, levels, setPlayer, enemies, playAudio } = useGameStore()
+  const { setMode, arenaClear, level, setLevel, levels, setPlayer, enemies, setHudInfo, playAudio } = useGameStore()
   const lvl = levels[level[0]][level[1]]
 
   const [, getKeys] = useKeyboardControls()
@@ -101,7 +101,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
 
     const dmgStatus = takeDamage(flag)
     if (dmgStatus==="damaged") {
-      playAudio("./audio/f-hurt.ogg", 0.7)
+      playAudio("./audio/f-hurt.ogg", 0.3)
       anim.current = "Take Damage"
       
       if (group.current.userData.health <= 0) {
@@ -112,10 +112,10 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
         }, 1000)
       }
 
-      // setHudInfo(prev => ({
-      //   ...prev,
-      //   health: group.current.health
-      // }))
+      console.log(group.current.userData.health ?? 200)
+      setHudInfo({
+        health: group.current.userData.health ?? 200
+      })
     }
   }
   
