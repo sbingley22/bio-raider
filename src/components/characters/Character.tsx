@@ -91,6 +91,7 @@ const Character: React.FC<{
     if (!group.current) return null
     let tempHealth = group.current.userData.health
     if (!tempHealth) return null
+    let status = "damaged"
 
     // incoming melee
     if (flag.type === "melee") {
@@ -102,10 +103,15 @@ const Character: React.FC<{
       }
     }
 
-    tempHealth -= flag.dmg
+    let dmgMultiplier = 1
+    if (anim.current === "float stunned") {
+      dmgMultiplier = 1.2
+    }
+
+    tempHealth -= flag.dmg * dmgMultiplier
     group.current.userData.health = tempHealth
 
-    return "damaged"
+    return status
   }
 
   const rotateToVec = (dx: number, dy: number) => {

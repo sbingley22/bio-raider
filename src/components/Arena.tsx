@@ -1,10 +1,11 @@
 import { useFrame, useThree } from '@react-three/fiber'
 import { Environment } from "@react-three/drei"
-import React, { useEffect, MutableRefObject, useRef } from 'react'
+import React, { useEffect, MutableRefObject, useRef, useState } from 'react'
 import { GamepadState } from './useGamepad'
 import { useGameStore } from './useGameStore'
 import ShadowCatcher from "./ShadowCatcher"
 import Character from "./characters/Character"
+import Collectables from './Collectables'
 
 interface ArenaProps {
   gamepadRef: MutableRefObject<GamepadState>
@@ -14,6 +15,8 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
   const { camera } = useThree()
   const { arenas, level, levels, setLevelImg, arenaClear, setArenaClear, enemies, setEnemies } = useGameStore()
   const arenaTimer = useRef<number>(0)
+
+  const [collectables, setCollectables] = useState([])
   
   useEffect(() => {
     const lvl = levels[level[0]][level[1]]
@@ -91,7 +94,7 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
       <Character 
         type="Player"
         gamepadRef={gamepadRef}
-        health={75}
+        health={100}
       />
 
       {Array.isArray(enemies) && enemies.map((enemy) => (
@@ -104,6 +107,21 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
           position={enemy.pos}
         />
       ))}
+
+      {collectables.map(collectable=> (
+        <Collectables
+          key={collectable.id}
+          id={collectable.id}
+          name={collectable.name}
+          type={collectable.type}
+          pos={collectable.pos}
+          amount={collectable.amount}
+          gamepad={gamepadRef}
+          collectables={collectables}
+          setCollectables={setCollectables}
+        />
+      ))}
+
     </>
   )
 }

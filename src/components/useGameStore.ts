@@ -78,10 +78,13 @@ export const useGameStore = create<GameState>((set) => ({
   setHudInfo: (hudInfo) => set({ hudInfo }),
   inventory: [
     {
+      name: "power ammo",
+      amount: 20
+    },
+    {
       name: "stun grenade",
       amount: 1,
     },
-    {name:"",amount:0},
     {name:"",amount:0},
     {name:"",amount:0},
     {name:"",amount:0},

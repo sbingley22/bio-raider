@@ -9,7 +9,7 @@ import { useGameStore } from "../useGameStore"
 
 const outfits = [
   ["SurvivorF", "Hair-WavyPunk", "Pistol", "GownFull", "Shoes-HighTops001"],
-  ["SurvivorF", "Hair-WavyPunk", "Pistol", "GownTop", "Shoes-HighTops001"],
+  ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "GownTop", "Shoes-HighTops001"],
   ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "GownTop", "Shoes-HighTops001"],
   ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "Shoes-HighTops001"],
 ]
@@ -22,6 +22,8 @@ interface Inputs {
   aY: number
   jump: boolean
   outfitD: number
+  inventoryD: number
+  inventoryUse: boolean
   interact: boolean
 }
 
@@ -38,14 +40,16 @@ interface PlayerProps {
 
 const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, moveInBounds }: PlayerProps) => {
   // console.log("Player Rerender")
-  const [visibleNodes, setVisibleNodes] = useState(outfits[0])
-  const outfit = useRef(0)
-  const { setMode, arenaClear, level, setLevel, levels, setPlayer, enemies, setHudInfo, playAudio } = useGameStore()
+  const [visibleNodes, setVisibleNodes] = useState(outfits[1])
+  const outfit = useRef(1)
+  const [skin, setSkin] = useState(1)
+  const { setMode, arenaClear, level, setLevel, levels, setPlayer, inventory, inventorySlot, setInventorySlot, setInventory,playAudio } = useGameStore()
   const lvl = levels[level[0]][level[1]]
 
   const [, getKeys] = useKeyboardControls()
   const generalKeyHeld = useRef<boolean>(false)
   const jumpForce = useRef<number | null>(null)
+  const targetedEnemy = useRef(null)
 
   const getInputs = (): Inputs => {
     const { forwardKey, backwardKey, leftKey, rightKey, jumpKey, interactKey, inventoryLeftKey, inventoryRightKey, inventoryUseKey, shiftKey, aimUpKey, aimLeftKey, aimRightKey, aimDownKey, outfitPrev, outfitNext } = getKeys()
@@ -87,13 +91,23 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     if (outfitPrev && !generalKeyHeld.current) outfitD = -1
     else if (outfitNext && !generalKeyHeld.current) outfitD = 1
 
+    let inventoryD = 0
+    if ((inventoryLeftKey || gamepadRef?.current?.inventoryLeft) && !generalKeyHeld.current) inventoryD = -1
+    else if ((inventoryRightKey || gamepadRef?.current?.inventoryRight) && !generalKeyHeld.current) inventoryD = 1
+
+    let inventoryUse = false
+    if (!generalKeyHeld.current) {
+      if (inventoryUseKey) inventoryUse = true
+      if (gamepadRef?.current?.inventoryUse) inventoryUse = true
+    }
+
     let interact = false
     if (interactKey && !generalKeyHeld.current) interact = true
 
-    if (outfitNext || outfitPrev || inventoryLeftKey || inventoryRightKey || interactKey) generalKeyHeld.current = true
+    if (outfitNext || outfitPrev || inventoryLeftKey || inventoryRightKey || interactKey || inventoryUse) generalKeyHeld.current = true
     else generalKeyHeld.current = false
 
-    return { shift, dX, dY, aX, aY, jump, outfitD, interact }
+    return { shift, dX, dY, aX, aY, jump, outfitD, inventoryD, inventoryUse, interact }
   }
 
   const damaged = (flag: any) => {
@@ -112,10 +126,12 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
         }, 1000)
       }
 
-      console.log(group.current.userData.health ?? 200)
-      setHudInfo({
-        health: group.current.userData.health ?? 200
-      })
+      useGameStore.setState((state) => ({
+        hudInfo: {
+          ...state.hudInfo,
+          health: group.current?.userData.health ?? 100
+        }
+      }))
     }
   }
   
@@ -128,6 +144,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     if (a === "Jump") return true
     if (a === "Land") return true
     if (a === "Pistol Fire") return true
+    if (a === "Pistol Fire2") return true
     if (a === "Take Damage") return true
     if (a === "Dying") return true
     if (a === "Stunned") return true
@@ -136,17 +153,207 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   }
 
   const updateInventory = (inputs: Inputs) => {
+    if (!group.current) return
+
+    if (inputs.inventoryD) {
+      let newSlot = inventorySlot + inputs.inventoryD
+      if (newSlot < 0) newSlot = inventory.length - 1
+      else if (newSlot >= inventory.length) newSlot = 0
+      setInventorySlot(newSlot)
+    }
+
+    if (inputs.inventoryUse) {
+      const removeItem = () => {
+        const tempInv = [...inventory]
+        tempInv[inventorySlot].amount -= 1
+        if (tempInv[inventorySlot].amount <= 0) {
+          tempInv[inventorySlot].name = ""
+        }
+        setInventory(tempInv)
+      }
+
+      const item = inventory[inventorySlot]
+      if (item && item.name !== "") {
+        if (item.name === "stun grenade") {
+          group.current.userData.enemies.forEach((z)=>{
+            z.current.userData.actionFlag = "Stunned"
+          })
+          removeItem()
+          playAudio("./audio/gun-cocking.wav", 0.9)
+        }
+        else if (item.name === "health kit") {
+          group.current.userData.health += 50
+          if (group.current.userData.health > 100) group.current.userData.health = 100
+          useGameStore.setState((state) => ({
+            hudInfo: {
+              ...state.hudInfo,
+              health: group.current?.userData.health ?? 100
+            }
+          }))
+          removeItem()
+        }
+      }
+    }
+
     if (inputs.outfitD) {
       let newOutfit = outfit.current + inputs.outfitD
       if (newOutfit < 0) newOutfit = outfits.length-1
       else if (newOutfit >= outfits.length) newOutfit = 0
       outfit.current = newOutfit
       setVisibleNodes(outfits[outfit.current])
+
+      if ([1,3].includes(newOutfit)) setSkin(1)
+      else setSkin(0)
+    }
+  }
+
+  const kick = () => {
+    let canKick = true
+    if (isUnskippableAnimation()) canKick = false
+    if (["Pistol Fire", "Pistol Fire2"].includes(anim.current)) canKick = true
+
+    if (!canKick) return
+
+    if (targetedEnemy.current) {
+      const zombie = group.current.userData.enemies.find(z => z.current.id === targetedEnemy.current)
+      if (zombie.current.position.distanceTo(group.current.position) < 2.0) { 
+        setTimeout(() => { 
+          zombie.current.userData.actionFlag = "kicked"
+        }, 350)
+      }
+    }
+
+    anim.current = "Fight Roundhouse"
+  }
+
+  const shoot = () => {
+    if (isUnskippableAnimation()) return
+    // console.log(anim.current)
+    anim.current = "Pistol Fire2"
+
+    if (targetedEnemy.current) {
+      let dmg = 20
+      if (inventory[inventorySlot].name === "power ammo") {
+        dmg *= 4
+        const tempInventory = [...inventory]
+        tempInventory[inventorySlot].amount -= 1
+        if (tempInventory[inventorySlot].amount <= 0) {
+          tempInventory[inventorySlot].name = ""
+          tempInventory[inventorySlot].amount = 0
+        }
+        setInventory(tempInventory)
+        playAudio("./audio/pistol-gunshot.wav", 0.25)
+        anim.current = "Pistol Fire"
+      }
+      else {
+        playAudio("./audio/pistol-gunshot.wav", 0.14)
+      }
+
+      // debugger
+      const enemy = group.current.userData.enemies.find(z => z.current.id === targetedEnemy.current)
+      enemy.current.userData.dmgFlag = {
+        dmg: dmg,
+        position: group.current.position,
+        range: null,
+      }
+    }
+  }
+    
+  const lockOnEnemy = (dx:number, dy:number) => {
+    if (!group.current)
+      return { x: dx, y: dy }
+
+    let closestEnemy = null;
+    let closestDistance = Infinity;
+    let closestAngle = Infinity;
+    targetedEnemy.current = null
+
+    // Loop through all enemies to find the closest one in the direction the player is facing
+    group.current.userData.enemies.forEach(e => {
+      if (!e.current) return
+
+      const enemy = e.current
+      if (enemy.userData.health <= 0) return
+      
+      // Get enemy position
+      const ex = enemy.position.x;
+      const ez = enemy.position.z;
+
+      // Calculate vector from player to enemy
+      const vx = ex - group.current.position.x;
+      const vz = ez - group.current.position.z;
+
+      // Calculate distance to enemy
+      const distance = Math.sqrt(vx * vx + vz * vz);
+
+      // Normalize the direction vector the player is facing
+      const len = Math.sqrt(dx * dx + dy * dy);
+      const ndx = dx / len;
+      const ndy = dy / len;
+
+      // Normalize the vector to the enemy
+      const lenEnemy = Math.sqrt(vx * vx + vz * vz);
+      const evx = vx / lenEnemy;
+      const evz = vz / lenEnemy;
+
+      // Calculate the angle between the player's direction and the vector to the enemy
+      const dotProduct = ndx * evx + ndy * evz;
+      const angle = Math.acos(dotProduct);
+
+      // Check if this enemy is the closest in the direction the player is facing
+      if (angle < Math.PI / 4 && distance < closestDistance && angle < closestAngle) { // You can adjust the angle threshold (Math.PI / 4) as needed
+        closestEnemy = { x: vx, y: vz };
+        closestDistance = distance;
+        closestAngle = angle;
+        targetedEnemy.current = enemy.id
+      }
+    });
+
+    // If no enemy is close enough in the direction, return the original direction
+    if (!closestEnemy) {
+      return { x: dx, y: dy }
+    }
+
+    return closestEnemy
+  }
+  const aim = (inputs: Inputs) => {
+    // console.log("aiming")
+    transition.current = "Pistol Aim2"
+    if (jumpForce.current !== null) return
+    let dx = inputs.aX
+    let dy = inputs.aY
+
+    const eLock = lockOnEnemy(dx, dy)
+    dx = eLock.x
+    dy = eLock.y
+
+    rotateToVec(dx, dy)
+
+    // console.log(targetedEnemy.current)
+    if (targetedEnemy.current) {
+      if (inputs.jump) {
+        // console.log("kicking")
+        kick()
+      } else {
+        // console.log("shooting")
+        shoot()
+      }
+    } 
+    else {
+      if (!isUnskippableAnimation()) {
+        // console.log("aiming")
+        anim.current = "Pistol Aim2"
+      }
     }
   }
 
   const movement = (inputs: Inputs, delta: number) => {
     if (group.current === null) return
+
+    if (inputs.aX || inputs.aY) {
+      aim(inputs)
+      return
+    }
 
     if (inputs.dX || inputs.dY)
     {
@@ -256,6 +463,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     <>
       <SurvivorModel
         visibleNodes={visibleNodes}
+        skin={skin}
         anim={anim}
         transition={transition}
       />

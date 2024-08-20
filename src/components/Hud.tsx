@@ -21,7 +21,6 @@ const Hud = () => {
     bgCol = "rgba(255,0,0,0.2)"
   }
   else if (hudInfo.health < 75) bgCol = "rgba(133,133,0,0.2)"
-  console.log(hudInfo.health)
 
   const imgSize = options.altCost>2 ? 256 : 128
 
@@ -35,7 +34,13 @@ const Hud = () => {
     else if (item.name === "slime spray") msg = "use slime spray by walking on slime and recieve no damage"
     else if (item.name === "power ammo") msg = "shoot with power ammo to deal high dmg"
 
-    setHudInfo({msg: msg})
+    useGameStore.setState((state) => ({
+      hudInfo: {
+        ...state.hudInfo,
+        msg: msg
+      },
+  }));
+
 
   }, [inventory, inventorySlot, setHudInfo])
   // console.log(hudInfo)

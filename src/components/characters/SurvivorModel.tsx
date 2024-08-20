@@ -1,18 +1,19 @@
-import React, { MutableRefObject, useEffect, useRef } from 'react'
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
 import glb from "../../assets/survivor.glb?url"
 import { useSkinnedMeshClone } from "./SkinnedMeshClone"
 import { useAnimations } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { AnimationMixer, AnimationMixerEvent, AnimationMixerEventMap } from 'three'
 
 const SurvivorModel: React.FC<{
   visibleNodes: Array<string>,
+  skin: number,
   anim: MutableRefObject<string | null>,
   transition: MutableRefObject<string | null>
-}> = ({ visibleNodes, anim, transition }) => {
-  const { scene, nodes, animations } = useSkinnedMeshClone(glb)
+}> = ({ visibleNodes, skin, anim, transition }) => {
+  const { scene, nodes, animations, materials } = useSkinnedMeshClone(glb)
   const { actions, mixer } = useAnimations(animations, scene)
   const lastAnim = useRef(anim.current)
+  const [skins, setSkins] = useState<Array<any>>([])
 
   // Initial setup
   useEffect(()=>{
@@ -29,7 +30,17 @@ const SurvivorModel: React.FC<{
     if (actions["Idle"]) {
       actions["Idle"].play()
     }
-  }, [nodes, actions])
+
+    const tempSkins = [...skins]
+    if (nodes["SurvivorF"]?.material && !tempSkins.includes(nodes["SurvivorF"].material)) {
+      tempSkins.push(materials[nodes["SurvivorF"].material.name])
+    }
+    if (nodes["SurvivorFGen"]?.material && !tempSkins.includes(nodes["SurvivorFGen"].material)) {
+      tempSkins.push(materials[nodes["SurvivorFGen"].material.name])
+    }
+    setSkins(tempSkins)
+
+  }, [nodes, actions, materials])
 
   // Set visible nodes
   useEffect(()=>{
@@ -53,19 +64,31 @@ const SurvivorModel: React.FC<{
     })
   }, [visibleNodes, nodes])
 
+  // Change Skin
+  useEffect(()=>{
+    if (skin === null) return
+    if (!skins || skins.length < 1) return
+    if (skin >= skins.length) return
+
+    // if (skin === 1) debugger
+    nodes["SurvivorF"].material = skins[skin]
+    nodes["SurvivorFGen"].material = skins[skin]
+
+  }, [skin, skins, nodes])
+
   // Mixer Settings
   useEffect(()=>{
     if (!mixer) return
     if (actions === null) return
 
-    const oneShotAnims = ["Fight Jab", "Fight Roundhouse", "Fight Straight", "Jump", "Land", "Pistol Fire", "Take Damage", "Dying", "Stunned"]
+    const oneShotAnims = ["Fight Jab", "Fight Roundhouse", "Fight Straight", "Jump", "Land", "Pistol Fire", "Pistol Fire2", "Take Damage", "Dying", "Stunned"]
     oneShotAnims.forEach(osa => {
       if (actions[osa] === null) return
       actions[osa].clampWhenFinished = true
       actions[osa].repetitions = 1
     })
 
-    const animFinished = (e: AnimationMixerEvent) => {
+    const animFinished = (e) => {
       const action = e.action.getClip().name
       // console.log(action)
       // debugger
@@ -75,8 +98,13 @@ const SurvivorModel: React.FC<{
         anim.current = "Pistol Aim"
         return
       }
+      if (action === "Pistol Fire2") {
+        if (anim.current === "Fight Roundhouse") return
+        anim.current = "Pistol Aim2"
+        return
+      }
       if (action === "Fight Roundhouse") {
-        anim.current = "Pistol Aim"
+        anim.current = "Pistol Aim2"
         return
       }
       if (action === "Jump") {

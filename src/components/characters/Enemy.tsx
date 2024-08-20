@@ -34,7 +34,7 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
     group.current.userData.aiMode = "melee"
     group.current.userData.range = 1.4
     group.current.userData.speed = 3
-    group.current.userData.attackPower = 20
+    group.current.userData.attackPower = 2
     group.current.userData.attackCooldown = 0
 
     if (model === "NKCell") {
@@ -49,20 +49,51 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
       group.current.userData.range = 1.4
       group.current.userData.speed = 2
     }
-  }, [model])
+  }, [group, model])
+
+  const kicked = () => {
+    let dmg = 1
+    let pushBack = 0.5
+    if (anim.current === "float stunned") {
+      dmg = 90
+      pushBack = 1
+    }
+
+    damaged({dmg: dmg})
+
+    // Push zombie back
+    const px = player.current.position.x
+    const pz = player.current.position.z
+    const zx = group.current.position.x
+    const zz = group.current.position.z
+    const dx = zx - px
+    const dz = zz - pz
+
+    const distance = Math.sqrt(dx * dx + dz * dz)
+    const ndx = dx / distance
+    const ndz = dz / distance
+
+    group.current.position.x += ndx * pushBack
+    group.current.position.z += ndz * pushBack
+  }
 
   const damaged = (flag: any) => {
     if (!group.current) return
+    // debugger
 
     const dmgStatus = takeDamage(flag)
     if (dmgStatus==="damaged") {
       if (group.current.userData.health <= 0) {
         // Enemy Dead
-        anim.current = "Dying"
+        anim.current = "float dying"
+        playAudio("./audio/z-die.wav", 0.2)
         // remove from enemies userData
         removeFromEnemiesRef()
         // remove from enemies state
-        setTimeout(()=>removeFromEnemiesState(), 1000)
+        setTimeout(()=>removeFromEnemiesState(), 2000)
+      }
+      else if (anim.current === "float stunned") {
+        anim.current = "float stunned"
       }
       else {
         const chance = Math.random()
@@ -84,9 +115,12 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
   }
 
   const removeFromEnemiesState = () => {
-    setEnemies((prev) => {
-      return prev.filter(enemy => enemy.id !== id)
-    })
+    // const tempEnemies = enemies.filter(enemy => enemy.id !== id)
+    // setEnemies(tempEnemies)
+    useGameStore.setState((state) => {
+      const updatedEnemies = state.enemies.filter(enemy => enemy.id !== id);
+      return { enemies: updatedEnemies };
+    });
   }
 
   const isUnskippableAnimation = () => {
@@ -102,6 +136,7 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
 
   const aiMelee = (px, pz, vx, vz, delta) => {
     if (!group.current) return
+    if (!anim.current) anim.current = "float idle"
 
     const distance = Math.sqrt(vx*vx + vz*vz)
     const pvx = vx / distance
@@ -124,6 +159,7 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
 
           group.current.userData.attackCooldown = 1
           setTimeout(()=>{
+            if (!group.current) return
             player.current.userData.dmgFlag = {
               type: "melee",
               dmg: group.current.userData.attackPower,
@@ -141,16 +177,17 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
     }
     else {
       // Close distance to target
-      if (["float jab", "float straight"].includes(anim.current)) return
+      if (["float jab", "float straight", "float stunned"].includes(anim.current)) return
 
       let tempSpeed = group.current.userData.speed
-      if (anim.current === "float dmg") tempSpeed *= 0.5
+      if (anim.current === "float dmg") tempSpeed *= 0.3
       const tempX = group.current.position.x + (tempSpeed * pvx * delta)
       const tempZ = group.current.position.z + (tempSpeed * pvz * delta)
       let canMove = true
 
       // check to see if path is blocked by other enemies
       player.current.userData.enemies.forEach(e => {
+        if (!group.current) return
         if (group.current.id === e.current.id) return
 
         const vx = e.current.position.x - group.current.position.x
@@ -186,11 +223,19 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
   }
 
   // Game Loop
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   useFrame((_state, delta) => {
+    if (anim.current === "float dying") return
 
     // Check flags
     if (group.current?.userData.actionFlag) {
+      const flag = group.current.userData.actionFlag
+      if (flag === "kicked") {
+        kicked()
+      }
+      else if (flag === "Stunned") {
+        anim.current = "float stunned"
+      }
+
       group.current.userData.actionFlag = null
     }
     if (group.current?.userData.dmgFlag) {

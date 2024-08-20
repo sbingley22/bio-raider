@@ -16,7 +16,6 @@ const Game: React.FC<GameProps> = ({ gamepadRef }) => {
     <div className="w-full h-full"
       style={{
         backgroundImage: `url(./bgs/${levelImg})`, 
-        // backgroundImage: `url(./bgs/)`, 
         backgroundSize: "cover", 
         backgroundPosition: "center"
       }}>

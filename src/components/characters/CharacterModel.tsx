@@ -81,6 +81,14 @@ const CharacterModel: React.FC<{
         anim.current = "float stance"
         return
       }
+      if (action === "float straight") {
+        anim.current = "float stance"
+        return
+      }
+      if (action === "float stunned") {
+        anim.current = "float stance"
+        return
+      }
       if (action === "float dying") {
         anim.current = "float dying"
         lastAnim.current = "float dying"
