@@ -62,6 +62,13 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
       setEnemies([])
     }
 
+    if (arena.collectables && arena.collectables.length > 0) {
+      setCollectables(arena.collectables)
+    }
+    else {
+      setCollectables([])
+    }
+
   }, [arenas, camera, level, levels, setArenaClear, setEnemies, setLevelImg])
 
   useFrame((_state,delta)=>{
@@ -79,7 +86,11 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
 
   return (
     <>
-      <Environment preset="night" environmentIntensity={4} />
+      <Environment 
+        preset="night" 
+        environmentIntensity={4} 
+        environmentRotation={[0,level[0] + level[1],0]}
+      />
       <ShadowCatcher scale={2} />
       <directionalLight 
         castShadow 

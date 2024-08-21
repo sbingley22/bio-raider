@@ -71,17 +71,19 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
 
   useFrame(()=>{
     if (!group.current) return
-    if (!player.current) return
+    if (!player || !player.current) return
 
-    const { interact } = getKeys()
+    const { interactKey } = getKeys()
 
     const dist = group.current.position.distanceTo(player.current.position)
     if (dist < 0.75) {
-      setHudInfo(prev => ({
-        ...prev,
-        msg: "E/X to pickup item"
-      }))
-      if (interact || gamepad.current.interact) {
+      useGameStore.setState((state) => ({
+        hudInfo: {
+          ...state.hudInfo,
+          msg: "E/X to pickup item"
+        },
+      }));
+      if (interactKey || gamepad.current.interact) {
         pickupItem()
       }
     }

@@ -6,6 +6,8 @@ import jillHurtImg from "../assets/status/jillHurt1.png"
 import jillHurtImgDev from "../assets/dev/status/jillHurt2.png"
 import { useEffect } from "react"
 
+const nextAreaClass = "from-purple-700 to-transparent"
+
 const Hud = () => {
   const { options, arenaClear, level, levels, hudInfo, setHudInfo, inventory, inventorySlot } = useGameStore()
   const lvl = levels[level[0]][level[1]]
@@ -31,7 +33,7 @@ const Hud = () => {
     let msg = "O/P/D-Up "
     if (item.name === "stun grenade") msg += "to use stun grenade"
     else if (item.name === "health kit") msg += "to use health kit"
-    else if (item.name === "slime spray") msg = "use slime spray by walking on slime and recieve no damage"
+    else if (item.name === "net spray") msg = "use net spray by walking on slime and recieve no damage"
     else if (item.name === "power ammo") msg = "shoot with power ammo to deal high dmg"
 
     useGameStore.setState((state) => ({
@@ -39,19 +41,18 @@ const Hud = () => {
         ...state.hudInfo,
         msg: msg
       },
-  }));
+    }));
 
 
   }, [inventory, inventorySlot, setHudInfo])
-  // console.log(hudInfo)
 
   return (
     <div className='h-full w-full'>
       { arenaClear && <>
-        {pathUp && <div className='absolute top-0 left-0 m-0 w-full h-10 bg-gradient-to-b from-green-700 to-transparent' />}
-        {pathDown && <div className='absolute bottom-0 left-0 m-0 w-full h-10 bg-gradient-to-t from-green-700 to-transparent' />}
-        {pathLeft && <div className='absolute top-0 left-0 m-0 w-10 h-full bg-gradient-to-r from-green-700 to-transparent' />}
-        {pathRight && <div className='absolute top-0 right-0 m-0 w-10 h-full bg-gradient-to-l from-green-700 to-transparent' />}
+        {pathUp && <div className={'absolute top-0 left-0 m-0 w-full h-10 bg-gradient-to-b ' + nextAreaClass} />}
+        {pathDown && <div className={'absolute bottom-0 left-0 m-0 w-full h-10 bg-gradient-to-t ' + nextAreaClass} />}
+        {pathLeft && <div className={'absolute top-0 left-0 m-0 w-10 h-full bg-gradient-to-r ' + nextAreaClass} />}
+        {pathRight && <div className={'absolute top-0 right-0 m-0 w-10 h-full bg-gradient-to-l ' + nextAreaClass} />}
       </>}
 
       <img 

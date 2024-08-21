@@ -36,7 +36,23 @@ export const arenas = {
   },
   "bone-marrow": {
     img: "vasculature1.png",
-    enemies: [],
+    enemies: [], 
+   "collectables": [
+      {
+        id: uuidv4(),
+        name: "health kit",
+        type: "HealthKit",
+        pos: [1,0,3],
+        amount: 1,
+      },
+      {
+        id: uuidv4(),
+        name: "net spray",
+        type: "Spray",
+        pos: [-1.5,0,3.5],
+        amount: 3,
+      },
+    ]
   }
 }
 

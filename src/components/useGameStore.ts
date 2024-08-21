@@ -6,6 +6,7 @@ import { MutableRefObject } from 'react'
 
 interface GameOptions {
   altCost: number
+  oneHand: boolean
 }
 
 interface EnemyObject {
@@ -52,6 +53,7 @@ export const useGameStore = create<GameState>((set) => ({
   setMode: (mode) => set({ mode }),
   options: {
     altCost: 0,
+    oneHand: false,
   },
   setOptions: (newOptions) =>
     set((state) => ({

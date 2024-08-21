@@ -3,6 +3,7 @@ import useGamepad from "./components/useGamepad"
 import { KeyboardControls } from "@react-three/drei"
 import Gamepad from "react-gamepad"
 import { useGameStore } from "./components/useGameStore"
+import MainMenu from "./MainMenu"
 
 function App() {
   const { mode, setMode, options, setOptions } = useGameStore()
@@ -25,18 +26,20 @@ function App() {
           { name: "backwardKey", keys: ["ArrowDown", "s", "S"] },
           { name: "leftKey", keys: ["ArrowLeft", "a", "A"] },
           { name: "rightKey", keys: ["ArrowRight", "d", "D"] },
-          { name: "jumpKey", keys: ["Space"] },
-          { name: "interactKey", keys: ["f", "F", "E", "e"] },
+          { name: "aimKey", keys: ["Space"] },
+          { name: "jumpKey", keys: ["'", ";", "Shift"] },
+          { name: "interactKey", keys: ["f", "F", "h", "H"] },
           { name: "inventoryLeftKey", keys: ["[", "1"] },
           { name: "inventoryRightKey", keys: ["]", "2"] },
-          { name: "inventoryUseKey", keys: ["p", "o", "P", "O"] },
-          { name: "shiftKey", keys: ["Shift"] },
+          { name: "inventoryUseKey", keys: ["p", "o", "P", "O", "q", "Q"] },
+          { name: "shiftKey", keys: ["v", "V", "n", "N"] },
           { name: "aimUpKey", keys: ["i", "I"] },
           { name: "aimDownKey", keys: ["k", "K"] },
           { name: "aimLeftKey", keys: ["j", "J"] },
           { name: "aimRightKey", keys: ["l", "L"] },
           { name: "outfitPrev", keys: ["9"] },
           { name: "outfitNext", keys: ["0"] },
+          { name: "controlModeKey", keys: ["7", "5"]},
         ]}
       >
         <Gamepad
@@ -49,19 +52,16 @@ function App() {
           <>
             {mode === 0 &&
               <>
-                <h1 className="text-5xl font-bold underline">
-                  Hello world!
-                </h1>
+                <MainMenu
+                  gamepadRef={gamepadRef}
+                />
               </>
             }
             
             {mode === 1 &&
               <>
                 <Game
-                  // setMode={setMode}
                   gamepadRef={gamepadRef}
-                  // options={options}
-                  // setOptions={setOptions}
                 />
               </>
             }

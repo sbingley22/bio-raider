@@ -9,9 +9,9 @@ import { useGameStore } from "../useGameStore"
 
 const outfits = [
   ["SurvivorF", "Hair-WavyPunk", "Pistol", "GownFull", "Shoes-HighTops001"],
-  ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "GownTop", "Shoes-HighTops001"],
-  ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "GownTop", "Shoes-HighTops001"],
-  ["SurvivorFGen", "Hair-WavyPunk", "Pistol", "Shoes-HighTops001"],
+  ["SurvivorFGen", "Hair-WavyPunk", "Hair-TiedBack", "Pistol", "GownTop", "Shoes-HighTops001"],
+  ["SurvivorFGen", "Hair-WavyPunk", "Hair-TiedBack", "Pistol", "GownTop", "Shoes-HighTops001"],
+  ["SurvivorFGen", "Hair-WavyPunk", "Hair-TiedBack", "Pistol", "Shoes-HighTops001"],
 ]
 
 interface Inputs {
@@ -43,7 +43,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   const [visibleNodes, setVisibleNodes] = useState(outfits[1])
   const outfit = useRef(1)
   const [skin, setSkin] = useState(1)
-  const { setMode, arenaClear, level, setLevel, levels, setPlayer, inventory, inventorySlot, setInventorySlot, setInventory,playAudio } = useGameStore()
+  const { setMode, options, setOptions, arenaClear, level, setLevel, levels, setPlayer, inventory, inventorySlot, setInventorySlot, setInventory,playAudio } = useGameStore()
   const lvl = levels[level[0]][level[1]]
 
   const [, getKeys] = useKeyboardControls()
@@ -52,12 +52,13 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   const targetedEnemy = useRef(null)
 
   const getInputs = (): Inputs => {
-    const { forwardKey, backwardKey, leftKey, rightKey, jumpKey, interactKey, inventoryLeftKey, inventoryRightKey, inventoryUseKey, shiftKey, aimUpKey, aimLeftKey, aimRightKey, aimDownKey, outfitPrev, outfitNext } = getKeys()
+    const { forwardKey, backwardKey, leftKey, rightKey, jumpKey, interactKey, inventoryLeftKey, inventoryRightKey, inventoryUseKey, shiftKey, aimKey, aimUpKey, aimLeftKey, aimRightKey, aimDownKey, outfitPrev, outfitNext, controlModeKey } = getKeys()
     const gamepadValid = gamepadRef && gamepadRef.current
 
     let shift = false
     if (shiftKey) shift = true
 
+    // Movement and aiming
     let dX = 0
     let dY = 0
     let aX = 0
@@ -76,6 +77,32 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     else if (aimRightKey) aX = 1
     if (aimUpKey) aY = -1
     else if (aimDownKey) aY = 1
+
+    // Single hand ctrls
+    if (controlModeKey && !generalKeyHeld.current) {
+      // setOptions(oneHand: !oneHand)
+      useGameStore.setState((state) => ({
+        options: {
+          ...state.options,
+          oneHand: !state.options.oneHand,
+        },
+      }));
+
+    }
+    if (options.oneHand) {
+      const tX = dX
+      const tY = dY
+      dX = aX
+      dY = aY
+      aX = tX
+      aY = tY
+    }
+    if (!aX && !aY && (aimKey)) {
+      aX = dX
+      aY = dY
+    }
+
+    // Make diagonals normalised
     if (Math.abs(dX) >= 1 && Math.abs(dY) >= 1) {
       dX *= 0.7
       dY *= 0.7
