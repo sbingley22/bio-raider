@@ -18,7 +18,8 @@ const Character: React.FC<{
   model: string | null,
   health: number,
   position: Array<number>,
-}> = ({ type, gamepadRef=null, id=null, model=null, health=100, position=[0,0,0] }) => {
+  splatterFlag: MutableRefObject<string> | null,
+}> = ({ type, gamepadRef=null, id=null, model=null, health=100, position=[0,0,0], splatterFlag }) => {
   const group = useRef<THREE.Group>(null)
   const anim = useRef<string>(null)
   const transition = useRef<string>(null)
@@ -110,6 +111,11 @@ const Character: React.FC<{
 
     tempHealth -= flag.dmg * dmgMultiplier
     group.current.userData.health = tempHealth
+
+    splatterFlag.current = {
+      pos: group.current.position,
+      color: type==="Player"? 0x772211 : 0x556611,
+    }
 
     return status
   }

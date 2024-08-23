@@ -6,6 +6,23 @@ export const arenas = {
       {
         img: "vasculatureSmall0.png",
         enemies: [],
+        nets: [
+          {
+            id: uuidv4(),
+            pos: [-1, 0, 2],
+            scale: 1,
+          },
+          {
+            id: uuidv4(),
+            pos: [3, 0, 4],
+            scale: 2,
+          },
+          {
+            id: uuidv4(),
+            pos: [-2, 0, 4],
+            scale: 1.5,
+          },
+        ]
       }
     ],
     "large": [
@@ -31,6 +48,28 @@ export const arenas = {
             pos: [-1,0,7],
           },
         ],
+        nets: [
+          {
+            id: uuidv4(),
+            pos: [-1, 0, 6],
+            scale: 1.4,
+          },
+          {
+            id: uuidv4(),
+            pos: [2, 0, 1],
+            scale: 2,
+          },
+          {
+            id: uuidv4(),
+            pos: [-5, 0, 4],
+            scale: 1.5,
+          },
+          {
+            id: uuidv4(),
+            pos: [5, 0, 5],
+            scale: 2.5,
+          },
+        ]
       }
     ],
   },
@@ -38,6 +77,13 @@ export const arenas = {
     img: "vasculature1.png",
     enemies: [], 
    "collectables": [
+      {
+        id: uuidv4(),
+        name: "type writer",
+        type: "TypeWriter",
+        pos: [0,0,0],
+        amount: 1,
+      },
       {
         id: uuidv4(),
         name: "health kit",

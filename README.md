@@ -17,9 +17,10 @@ Gameplay will involve shooting enemies with auto aim lockon, using items, applyi
 
 TODO:
 Allow loading in of alt dev assets through imports
-Single Handed Control scheme (jkli or left analogue) does movement then switches to shooting when space / lt held
-
-
+Add ai generated backgrounds
+Add ai generated status images
+Add save rooms
+Add ranged enemies (plasma b cells and memory b cells)
 
 To get Xbox Controller Working change in package.json
 "react-gamepad": "^1.0.3" to "react-gamepad": "SBRK/react-gamepad",

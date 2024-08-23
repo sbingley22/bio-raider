@@ -6,6 +6,8 @@ import { useGameStore } from './useGameStore'
 import ShadowCatcher from "./ShadowCatcher"
 import Character from "./characters/Character"
 import Collectables from './Collectables'
+import Net from './Net'
+import BloodManager from "./BloodManager"
 
 interface ArenaProps {
   gamepadRef: MutableRefObject<GamepadState>
@@ -13,10 +15,11 @@ interface ArenaProps {
 
 const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
   const { camera } = useThree()
-  const { arenas, level, levels, setLevelImg, arenaClear, setArenaClear, enemies, setEnemies } = useGameStore()
+  const { arenas, level, levels, setLevelImg, arenaClear, setArenaClear, enemies, setEnemies, nets, setNets } = useGameStore()
   const arenaTimer = useRef<number>(0)
 
   const [collectables, setCollectables] = useState([])
+  const splatterFlag = useRef(null)
   
   useEffect(() => {
     const lvl = levels[level[0]][level[1]]
@@ -69,7 +72,14 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
       setCollectables([])
     }
 
-  }, [arenas, camera, level, levels, setArenaClear, setEnemies, setLevelImg])
+    if (arena.nets && arena.nets.length > 0) {
+      setNets(arena.nets)
+    }
+    else {
+      setNets([])
+    }
+
+  }, [arenas, camera, level, levels, setArenaClear, setEnemies, setLevelImg, setNets])
 
   useFrame((_state,delta)=>{
     if (arenaTimer.current !== null) {
@@ -106,6 +116,7 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
         type="Player"
         gamepadRef={gamepadRef}
         health={100}
+        splatterFlag={splatterFlag}
       />
 
       {Array.isArray(enemies) && enemies.map((enemy) => (
@@ -116,11 +127,12 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
           model={enemy.model}
           health={enemy.health}
           position={enemy.pos}
+          splatterFlag={splatterFlag}
         />
       ))}
 
       {collectables.map(collectable=> (
-        <Collectables
+        collectable.name !== "" && <Collectables
           key={collectable.id}
           id={collectable.id}
           name={collectable.name}
@@ -132,6 +144,17 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
           setCollectables={setCollectables}
         />
       ))}
+
+      {nets.map(net=> (
+        <Net
+          key={net.id}
+          id={net.id}
+          pos={net.pos}
+          scale={net.scale}
+        />
+      ))}
+
+      <BloodManager splatterFlag={splatterFlag} />
 
     </>
   )

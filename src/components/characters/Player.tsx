@@ -374,7 +374,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     }
   }
 
-  const movement = (inputs: Inputs, delta: number) => {
+  const movement = (inputs: Inputs, delta: number, ground: string|null) => {
     if (group.current === null) return
 
     if (inputs.aX || inputs.aY) {
@@ -393,6 +393,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
       }
       if (inputs.shift) walking = true
       if (walking)  speed *= 0.5
+      if (ground === "net") speed *= 0.3
 
       let dx = 0
       let dy = 0
@@ -405,8 +406,12 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
       const outOfBounds = moveInBounds(dx, dy)
       rotateToVec(inputs.dX, inputs.dY)
 
-      if (!isUnskippableAnimation()) anim.current = walking? injured? "WalkingHurt" : "Walking" : "Jogging"
-      transition.current = walking? injured? "WalkingHurt" : "Walking" : "Jogging"
+      let moveAnim = "Jogging"
+      if (walking) moveAnim = "Walking"
+      if (injured) moveAnim = "WalkingHurt"
+      if (ground === "net") moveAnim = "WalkingWade"
+      if (!isUnskippableAnimation()) anim.current = moveAnim
+      transition.current = moveAnim
 
       if (outOfBounds !== null && arenaClear) {
         // console.log(outOfBounds)
@@ -434,12 +439,13 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     }
   }
   
-  const jumping = (inputs: Inputs, delta: number) => {
+  const jumping = (inputs: Inputs, delta: number, ground: string|null) => {
     if (!group.current) return
 
     if (jumpForce.current === null) {
       // player is grounded
       if (isUnskippableAnimation()) return
+      if (ground === "net") return
       if (inputs.aX || inputs.aY) return
       if (inputs.jump) {
         jumpForce.current = 0.09
@@ -470,6 +476,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     const inputs = getInputs()
 
     // Check Flags
+    let ground = null
     if (group.current?.userData.actionFlag) {
       group.current.userData.actionFlag = null
     }
@@ -477,13 +484,17 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
       damaged(group.current.userData.dmgFlag)
       group.current.userData.dmgFlag = null
     }
+    if (group.current?.userData.groundFlag) {
+      ground = group.current.userData.groundFlag
+      group.current.userData.groundFlag = null
+    }
 
-    movement(inputs, delta)
-    jumping(inputs, delta)
+    movement(inputs, delta, ground)
+    jumping(inputs, delta, ground)
 
     updateInventory(inputs)
     
-    if (inputs.interact) console.log(group.current?.userData.enemies)
+    // if (inputs.interact) console.log(group.current?.userData.enemies)
   })
 
   return (

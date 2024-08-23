@@ -38,6 +38,8 @@ interface GameState {
   setPlayer: (player: THREE.Group) => void
   enemies: Array<EnemyObject>
   setEnemies: (enemies: Array<EnemyObject>) => void
+  nets: Array<any>
+  setNets: (nets: Array<any>) => void
   hudInfo: any
   setHudInfo: (hudInfo: any) => void
   inventory: Array<any>
@@ -73,6 +75,8 @@ export const useGameStore = create<GameState>((set) => ({
   setPlayer: (player) => set({ player }),
   enemies: [],
   setEnemies: (enemies) => set({ enemies }),
+  nets: [],
+  setNets: (nets) => set({ nets }),
   hudInfo: {
     msg: "",
     health: 100,

@@ -19,7 +19,22 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
   const group = useRef()
   const [visibleNodes, setVisibleNodes] = useState<Array<string>>([])
   const [, getKeys] = useKeyboardControls()
-  const { player, inventory, setInventory } = useGameStore()
+  const { arenas, setArenas, levels, setLevels, level, player, inventory, setInventory } = useGameStore()
+
+  // remove item from levels data
+  const removeCollectableFromLevels = () => {
+    const tempArenas = {...arenas}
+    const name = levels[level[0]][level[1]].name
+    const type = levels[level[0]][level[1]].type
+
+    if (type === "unique") {
+      // find collectable by id
+      tempArenas[name].collectables.forEach(col => {
+        if (col.id === id) col.name = ""
+      })
+      setArenas(tempArenas)
+    }
+  }
 
   useEffect(()=>{
     if (type === "HealthKit") {
@@ -33,6 +48,9 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
     }
     else if (type === "Ammo") {
       setVisibleNodes(["Ammo"])
+    }
+    else if (type === "TypeWriter") {
+      setVisibleNodes(["TypeWriter"])
     }
   }, [type])
 
@@ -58,6 +76,7 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
       tempInventory[emptyIndex].name = name
       tempInventory[emptyIndex].amount = amount
       setInventory(tempInventory)
+      removeCollectableFromLevels()
       return
     }
 
@@ -84,7 +103,11 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
         },
       }));
       if (interactKey || gamepad.current.interact) {
-        pickupItem()
+        if (name === "type writer") {
+          console.log("Saving")
+        } else {
+          pickupItem()
+        }
       }
     }
   })
