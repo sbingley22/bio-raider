@@ -73,6 +73,19 @@ const Hud = () => {
         ))}
       </div>
 
+      {hudInfo.showMap && <div className='absolute top-0 left-0 m-14 border-4 border-gray-700 bg-black w-2/4 h-2/4'>
+        {levels.slice().reverse().map((y, indexY) => (
+          <div key={indexY+"map"} className=''>
+            {y.map((x, indexX) => (
+              <div 
+                key={`${indexX}${indexY}square`} 
+                className={`inline-block m-1 w-14 h-14 ${!x.name? "bg-black" : (x.y===level[0] && x.x===level[1]) ? "bg-slate-300" : "bg-slate-500"}`}></div>
+            ))}
+          </div>
+        ))}
+
+      </div>}
+
     </div>
   )
 }

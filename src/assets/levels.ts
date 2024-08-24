@@ -23,6 +23,46 @@ export const arenas = {
             scale: 1.5,
           },
         ]
+      },
+      {
+        img: "vasculatureSmall0.png",
+        enemies: [
+          {
+            id: uuidv4(),
+            model: "NKCell",
+            health: 100,
+            pos: [-1,0,3],
+          },
+          {
+            id: uuidv4(),
+            model: "Neutrophil",
+            health: 100,
+            pos: [3,0,5],
+          },
+          {
+            id: uuidv4(),
+            model: "NKCell",
+            health: 100,
+            pos: [-1,0,7],
+          },
+        ],
+        nets: [
+          {
+            id: uuidv4(),
+            pos: [-1, 0, 2],
+            scale: 1,
+          },
+          {
+            id: uuidv4(),
+            pos: [3, 0, 4],
+            scale: 2,
+          },
+          {
+            id: uuidv4(),
+            pos: [2, 0, 4],
+            scale: 1.5,
+          },
+        ]
       }
     ],
     "large": [
@@ -70,7 +110,52 @@ export const arenas = {
             scale: 2.5,
           },
         ]
-      }
+      },
+      {
+        img: "vasculatureLarge0.png",
+        enemies: [
+          {
+            id: uuidv4(),
+            model: "NKCell",
+            health: 100,
+            pos: [7,0,3],
+          },
+          {
+            id: uuidv4(),
+            model: "Neutrophil",
+            health: 100,
+            pos: [5,0,5],
+          },
+          {
+            id: uuidv4(),
+            model: "NKCell",
+            health: 100,
+            pos: [-1,0,7],
+          },
+        ],
+        nets: [
+          {
+            id: uuidv4(),
+            pos: [1, 0, 6],
+            scale: 1.4,
+          },
+          {
+            id: uuidv4(),
+            pos: [2, 0, 3],
+            scale: 2,
+          },
+          {
+            id: uuidv4(),
+            pos: [3, 0, 4],
+            scale: 1.5,
+          },
+          {
+            id: uuidv4(),
+            pos: [1, 0, 5],
+            scale: 2.5,
+          },
+        ]
+      },
     ],
   },
   "bone-marrow": {
@@ -99,7 +184,7 @@ export const arenas = {
         amount: 3,
       },
     ]
-  }
+  },
 }
 
 export const levelData = [
@@ -163,10 +248,67 @@ export const levelData = [
     {
       x: 3,
       y: 1,
+      name: "vasculature",
+      type: "random",
+      size: "small",
+      pathDown: "open",
+      pathRight: "open",
+    },
+    {
+      x: 4,
+      y: 1,
+      name: "vasculature",
+      type: "random",
+      size: "small",
+      pathUp: "open",
+      pathLeft: "open",
+    },
+  ],
+  // LEVEL 2 ---------------------
+  [
+    {
+      x: 0,
+      y: 2,
+      name: "bone-marrow",
+      type: "unique",
+      size: "small",
+      pathRight: "open",
+    },
+    {
+      x: 1,
+      y: 2,
+      name: "vasculature",
+      type: "random",
+      size: "large",
+      pathLeft: "open",
+      pathRight: "open",
+    },
+    {
+      x: 2,
+      y: 2,
+      name: "vasculature",
+      type: "random",
+      size: "large",
+      pathLeft: "open",
+      pathRight: "open",
+    },
+    {
+      x: 3,
+      y: 2,
+      name: "vasculature",
+      type: "random",
+      size: "small",
+      pathRight: "open",
+      pathLeft: "open",
+    },
+    {
+      x: 4,
+      y: 2,
       name: "bone-marrow",
       type: "unique",
       size: "small",
       pathDown: "open",
+      pathLeft: "open",
     },
   ],
 ]

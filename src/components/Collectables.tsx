@@ -111,12 +111,15 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
 
     const dist = group.current.position.distanceTo(player.current.position)
     if (dist < 0.75) {
+      let message = "E/X to pickup item"
+      if (name === "type writer") message = "E/X to save game"
       useGameStore.setState((state) => ({
         hudInfo: {
           ...state.hudInfo,
-          msg: "E/X to pickup item"
+          msg: message        
         },
       }));
+
       if (!interactHeld.current && (interactKey || gamepad.current.interact)) {
         if (name === "type writer") {
           saveGame()

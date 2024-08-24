@@ -21,8 +21,10 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
 
   // Add to player user data
   useEffect(()=>{
+    if (!group) return
+
     // update enemies state with react group ref
-    if (player) {
+    if (player && player.current) {
       player.current.userData.enemies.push(group)
     }
   }, [group, player])
@@ -34,7 +36,7 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
     group.current.userData.aiMode = "melee"
     group.current.userData.range = 1.4
     group.current.userData.speed = 3
-    group.current.userData.attackPower = 2
+    group.current.userData.attackPower = 20
     group.current.userData.attackCooldown = 0
 
     if (model === "NKCell") {
@@ -186,8 +188,12 @@ const Enemy = ({ id, model="NKCell", group, anim, transition, takeDamage, rotate
       let canMove = true
 
       // check to see if path is blocked by other enemies
+      if (!player || !player.current) {
+        console.log("Cant find Player")
+        return
+      }
       player.current.userData.enemies.forEach(e => {
-        if (!group.current) return
+        if (!group.current || !e || !e.current) return
         if (group.current.id === e.current.id) return
 
         const vx = e.current.position.x - group.current.position.x

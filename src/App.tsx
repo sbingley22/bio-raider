@@ -40,6 +40,7 @@ function App() {
           { name: "outfitPrev", keys: ["9"] },
           { name: "outfitNext", keys: ["0"] },
           { name: "controlModeKey", keys: ["7", "5"]},
+          { name: "mapKey", keys: ["m", "c"]},
         ]}
       >
         <Gamepad

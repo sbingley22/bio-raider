@@ -112,13 +112,26 @@ const Arena: React.FC<ArenaProps> = ({ gamepadRef, loadGame=false }) => {
     }
   })
   
+  const levelName = levels[level[0]][level[1]].name
+  let ePreset = "night"
+  let eIntensity = 6
+  if (levelName === "bone-marrow") {
+    ePreset = "forest"
+    eIntensity = 1
+  }
 
   return (
     <>
       <Environment 
-        preset="night" 
-        environmentIntensity={4} 
+        preset={ePreset} 
+        environmentIntensity={eIntensity} 
         environmentRotation={[0,level[0] + level[1],0]}
+        background
+        backgroundIntensity={eIntensity/2}
+        // ground={{
+        //   scale: 20,
+        //   }
+        // }
       />
       <ShadowCatcher scale={2} />
       <directionalLight 

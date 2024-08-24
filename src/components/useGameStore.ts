@@ -51,7 +51,7 @@ interface GameState {
 }
 
 export const useGameStore = create<GameState>((set) => ({
-  mode: 0,
+  mode: 1,
   setMode: (mode) => set({ mode }),
   options: {
     altCost: 0,
@@ -63,7 +63,7 @@ export const useGameStore = create<GameState>((set) => ({
     })),
   arenas: arenas,
   setArenas: (arenas) => set({ arenas }),
-  level: [0,0],
+  level: [1,0],
   setLevel: (level) => set({ level }),
   levels: levelData,
   setLevels: (levels) => set({ levels }),
@@ -80,6 +80,7 @@ export const useGameStore = create<GameState>((set) => ({
   hudInfo: {
     msg: "",
     health: 100,
+    showMap: false,
   },
   setHudInfo: (hudInfo) => set({ hudInfo }),
   inventory: [

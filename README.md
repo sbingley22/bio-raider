@@ -20,7 +20,6 @@ Allow loading in of alt dev assets through imports
 Add ai generated backgrounds
 Add ai generated status images
 Add ranged enemies (plasma b cells and memory b cells)
-Add map button bound to "m" "c". Toggles map overlay.
 
 To get Xbox Controller Working change in package.json
 "react-gamepad": "^1.0.3" to "react-gamepad": "SBRK/react-gamepad",

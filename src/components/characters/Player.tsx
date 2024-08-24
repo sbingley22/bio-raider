@@ -25,6 +25,7 @@ interface Inputs {
   inventoryD: number
   inventoryUse: boolean
   interact: boolean
+  map: boolean
 }
 
 interface PlayerProps {
@@ -43,7 +44,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   const [visibleNodes, setVisibleNodes] = useState(outfits[1])
   const outfit = useRef(1)
   const [skin, setSkin] = useState(1)
-  const { setMode, options, setOptions, arenaClear, level, setLevel, levels, setPlayer, inventory, inventorySlot, setInventorySlot, setInventory,playAudio } = useGameStore()
+  const { setMode, options, arenaClear, level, setLevel, levels, setPlayer, inventory, inventorySlot, setInventorySlot, setInventory,playAudio } = useGameStore()
   const lvl = levels[level[0]][level[1]]
 
   const [, getKeys] = useKeyboardControls()
@@ -52,7 +53,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
   const targetedEnemy = useRef(null)
 
   const getInputs = (): Inputs => {
-    const { forwardKey, backwardKey, leftKey, rightKey, jumpKey, interactKey, inventoryLeftKey, inventoryRightKey, inventoryUseKey, shiftKey, aimKey, aimUpKey, aimLeftKey, aimRightKey, aimDownKey, outfitPrev, outfitNext, controlModeKey } = getKeys()
+    const { forwardKey, backwardKey, leftKey, rightKey, jumpKey, interactKey, inventoryLeftKey, inventoryRightKey, inventoryUseKey, shiftKey, aimKey, aimUpKey, aimLeftKey, aimRightKey, aimDownKey, outfitPrev, outfitNext, controlModeKey, mapKey } = getKeys()
     const gamepadValid = gamepadRef && gamepadRef.current
 
     let shift = false
@@ -131,10 +132,13 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
     let interact = false
     if (interactKey && !generalKeyHeld.current) interact = true
 
-    if (outfitNext || outfitPrev || inventoryLeftKey || inventoryRightKey || interactKey || inventoryUse) generalKeyHeld.current = true
+    let map = false
+    if (!generalKeyHeld.current && (mapKey || gamepadRef?.current?.map)) map = true
+
+    if (outfitNext || outfitPrev || inventoryLeftKey || inventoryRightKey || interactKey || inventoryUse || mapKey) generalKeyHeld.current = true
     else generalKeyHeld.current = false
 
-    return { shift, dX, dY, aX, aY, jump, outfitD, inventoryD, inventoryUse, interact }
+    return { shift, dX, dY, aX, aY, jump, outfitD, inventoryD, inventoryUse, interact, map }
   }
 
   const damaged = (flag: any) => {
@@ -149,7 +153,7 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
         // game over
         anim.current = "Dying"
         setTimeout(()=>{
-          // setMode(0)
+          setMode(0)
         }, 1000)
       }
 
@@ -231,6 +235,15 @@ const Player = ({ group, gamepadRef, anim, transition, takeDamage, rotateToVec, 
 
       if ([1,3].includes(newOutfit)) setSkin(1)
       else setSkin(0)
+    }
+
+    if (inputs.map) {
+      useGameStore.setState((state) => ({
+        hudInfo: {
+          ...state.hudInfo,
+          showMap: !state.hudInfo.showMap
+        }
+      }))
     }
   }
 

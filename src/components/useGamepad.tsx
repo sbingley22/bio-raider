@@ -11,6 +11,7 @@ export interface GamepadState {
   inventoryLeft: boolean;
   inventoryRight: boolean;
   inventoryUse: boolean;
+  map: boolean;
 }
 
 const useGamepad = () => {
@@ -24,6 +25,7 @@ const useGamepad = () => {
     inventoryLeft: false,
     inventoryRight: false,
     inventoryUse: false,
+    map: false,
   });
 
   const handleGamepadButtonDown = (buttonName: string) => {
@@ -35,6 +37,9 @@ const useGamepad = () => {
         gamepadRef.current.jump = true;
         break;
       case "X":
+        gamepadRef.current.interact = true;
+        break;
+      case "Y":
         gamepadRef.current.interact = true;
         break;
       case "DPadLeft":
@@ -60,6 +65,9 @@ const useGamepad = () => {
         gamepadRef.current.jump = false;
         break;
       case "X":
+        gamepadRef.current.interact = false;
+        break;
+      case "Y":
         gamepadRef.current.interact = false;
         break;
       case "DPadLeft":
