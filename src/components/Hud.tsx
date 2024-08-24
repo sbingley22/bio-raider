@@ -11,6 +11,7 @@ const nextAreaClass = "from-purple-700 to-transparent"
 const Hud = () => {
   const { options, arenaClear, level, levels, hudInfo, setHudInfo, inventory, inventorySlot } = useGameStore()
   const lvl = levels[level[0]][level[1]]
+  // console.log("Hud lvl", lvl, level, levels)
   const pathUp = lvl.pathUp === "open"
   const pathDown = lvl.pathDown === "open"
   const pathLeft = lvl.pathLeft === "open"

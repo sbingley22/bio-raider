@@ -20,6 +20,7 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
   const [visibleNodes, setVisibleNodes] = useState<Array<string>>([])
   const [, getKeys] = useKeyboardControls()
   const { arenas, setArenas, levels, setLevels, level, player, inventory, setInventory } = useGameStore()
+  const interactHeld = useRef(false)
 
   // remove item from levels data
   const removeCollectableFromLevels = () => {
@@ -88,6 +89,20 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
     }))
   }
 
+  const saveGame = () => {
+    // console.log("Saving")
+    const saveData = {
+      player: {
+        health: player?.current.userData.health,
+      },
+      inventory: inventory,
+      level: level,
+      arenas: arenas,
+    }
+
+    localStorage.setItem("save1", JSON.stringify(saveData))
+  }
+
   useFrame(()=>{
     if (!group.current) return
     if (!player || !player.current) return
@@ -102,14 +117,17 @@ const Collectables: React.FC<CollectablesProps> = ({ id, name, type, pos, amount
           msg: "E/X to pickup item"
         },
       }));
-      if (interactKey || gamepad.current.interact) {
+      if (!interactHeld.current && (interactKey || gamepad.current.interact)) {
         if (name === "type writer") {
-          console.log("Saving")
+          saveGame()
         } else {
           pickupItem()
         }
       }
     }
+
+    if (interactKey) interactHeld.current = true
+    else interactHeld.current = false
   })
 
   return (

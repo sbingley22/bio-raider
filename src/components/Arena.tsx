@@ -11,16 +11,35 @@ import BloodManager from "./BloodManager"
 
 interface ArenaProps {
   gamepadRef: MutableRefObject<GamepadState>
+  loadGame: boolean
 }
 
-const Arena: React.FC<ArenaProps> = ({ gamepadRef }) => {
+const Arena: React.FC<ArenaProps> = ({ gamepadRef, loadGame=false }) => {
   const { camera } = useThree()
-  const { arenas, level, levels, setLevelImg, arenaClear, setArenaClear, enemies, setEnemies, nets, setNets } = useGameStore()
+  const { arenas, setArenas, level, setLevel, levels, setLevelImg, arenaClear, setArenaClear, player, enemies, setEnemies, setInventory, nets, setNets } = useGameStore()
   const arenaTimer = useRef<number>(0)
 
   const [collectables, setCollectables] = useState([])
   const splatterFlag = useRef(null)
-  
+ 
+  // load save data
+  useEffect(()=>{
+    if (!loadGame) return
+
+    const data = JSON.parse(localStorage.getItem('save1'))
+    if (data) {
+      // console.log("Load data: ", data)
+      if (player?.current) player.current.userData.health = data.player.health ?? 100
+      if (data.inventory) setInventory(data.inventory)
+      if (data.level) setLevel(data.level)
+      if (data.arenas) setArenas(data.arenas)
+    }
+    else {
+      console.log("Couldn't load data")
+    }
+  }, [loadGame]) 
+
+  // load level
   useEffect(() => {
     const lvl = levels[level[0]][level[1]]
     if (!lvl) {

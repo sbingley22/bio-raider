@@ -1,5 +1,4 @@
-
-import { useGameStore } from "./components/useGameStore";
+import { useGameStore } from "./useGameStore";
 
 const MainMenu = ({ gamepadRef }) => {
   const { setMode, options, setOptions } = useGameStore()
@@ -18,6 +17,13 @@ const MainMenu = ({ gamepadRef }) => {
         style={{backgroundColor: "rgba(0,0,0,0.85)"}}
       >
         <button onClick={()=>setMode(1)}>START</button>
+      </div>
+
+      <div 
+        className="text-3xl border-red-900 hover:border-red-800 border-2 rounded-md p-2 m-4"
+        style={{backgroundColor: "rgba(0,0,0,0.85)"}}
+      >
+        <button onClick={()=>setMode(2)}>CONTINUE</button>
       </div>
 
     </div>

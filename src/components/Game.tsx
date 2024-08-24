@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber"
-import { MutableRefObject, Suspense, } from "react"
+import { MutableRefObject, Suspense, useEffect, } from "react"
 import { GamepadState } from "./useGamepad"
 import { useGameStore } from "./useGameStore"
 import Arena from "./Arena"
@@ -7,9 +7,10 @@ import Hud from "./Hud"
 
 interface GameProps {
   gamepadRef: MutableRefObject<GamepadState>
+  loadGame: boolean
 }
 
-const Game: React.FC<GameProps> = ({ gamepadRef }) => {
+const Game: React.FC<GameProps> = ({ gamepadRef, loadGame=false }) => {
   const { levelImg } = useGameStore()
 
   return (
@@ -29,6 +30,7 @@ const Game: React.FC<GameProps> = ({ gamepadRef }) => {
         >
           <Arena 
             gamepadRef={gamepadRef}
+            loadGame={loadGame}
           />
         </Canvas>
       </Suspense>

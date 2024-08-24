@@ -51,7 +51,7 @@ interface GameState {
 }
 
 export const useGameStore = create<GameState>((set) => ({
-  mode: 1,
+  mode: 0,
   setMode: (mode) => set({ mode }),
   options: {
     altCost: 0,

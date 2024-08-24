@@ -3,10 +3,10 @@ import useGamepad from "./components/useGamepad"
 import { KeyboardControls } from "@react-three/drei"
 import Gamepad from "react-gamepad"
 import { useGameStore } from "./components/useGameStore"
-import MainMenu from "./MainMenu"
+import MainMenu from "./components/MainMenu"
 
 function App() {
-  const { mode, setMode, options, setOptions } = useGameStore()
+  const { mode } = useGameStore()
   
   // Use the custom useGamepad hook
   const {
@@ -62,9 +62,20 @@ function App() {
               <>
                 <Game
                   gamepadRef={gamepadRef}
+                  loadGame={false}
                 />
               </>
             }
+            
+            {mode === 2 &&
+              <>
+                <Game
+                  gamepadRef={gamepadRef}
+                  loadGame={true}
+                />
+              </>
+            }
+
           </>
         </Gamepad>
       </KeyboardControls>

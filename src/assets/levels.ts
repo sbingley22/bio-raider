@@ -121,6 +121,25 @@ export const levelData = [
       type: "random",
       size: "large",
       pathLeft: "open",
+      pathRight: "open",
+    },
+    {
+      x: 2,
+      y: 0,
+      name: "vasculature",
+      type: "random",
+      size: "large",
+      pathLeft: "open",
+      pathRight: "open",
+    },
+    {
+      x: 3,
+      y: 0,
+      name: "vasculature",
+      type: "random",
+      size: "small",
+      pathUp: "open",
+      pathLeft: "open",
     },
   ],
   // LEVEL 1 ---------------------
@@ -132,6 +151,22 @@ export const levelData = [
       type: "unique",
       size: "small",
       pathDown: "open",
-    }
+    },
+    {
+      x: 1,
+      y: 1,
+    },
+    {
+      x: 2,
+      y: 1,
+    },
+    {
+      x: 3,
+      y: 1,
+      name: "bone-marrow",
+      type: "unique",
+      size: "small",
+      pathDown: "open",
+    },
   ],
 ]
